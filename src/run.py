@@ -1,7 +1,6 @@
 #!/bin/sh
 
 import os
-
 os.sys.path.append(os.path.abspath('.'))
 os.sys.path.append(os.path.dirname(os.path.abspath('.')))
 
@@ -93,8 +92,6 @@ def train(args):
   if(args.grocery == 'false'):
     X_train, Y_train = load_h5(args.train)
     X_val, Y_val = load_h5(args.val)
-#    print('Train X_train:', X_train.size)
-#    print('Train Y_tain:', Y_train.size)
   else:
     X_train = pickle.load(open("../data/grocery/grocery/grocery-train-data" + args.train))
     Y_train = pickle.load(open("../data/grocery/grocery/grocery-train-label" + args.train))

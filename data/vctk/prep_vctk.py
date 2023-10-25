@@ -45,7 +45,6 @@ args = parser.parse_args()
 from scipy.signal import butter, lfilter
 import re
 
-
 def butter_bandpass(lowcut, highcut, fs, order=5):
     nyq = 0.5 * fs
     low = lowcut / nyq

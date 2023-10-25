@@ -49,9 +49,9 @@ def upsample_wav(wav, args, model):
   sf.write(outname + '.pr.wav', x_pr, fs)
 
   # save the spectrum
-  S = get_spectrum(x_pr, n_fft=int(2048))
+  S = get_spectrum(x_pr, n_fft=2048)
   save_spectrum(S, outfile=outname + '.pr.png')
-  S = get_spectrum(x_hr, n_fft=int(2048))
+  S = get_spectrum(x_hr, n_fft=2048)
   save_spectrum(S, outfile=outname + '.hr.png')
   S = get_spectrum(x_lr, n_fft=int(2048/args.r))
   save_spectrum(S, outfile=outname + '.lr.png')

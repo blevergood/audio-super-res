@@ -1,8 +1,6 @@
 import os
-import pickle
 import time
 
-import librosa
 import numpy as np
 import tensorflow as tf
 import pickle
@@ -11,9 +9,6 @@ import librosa
 from tensorflow.python.keras import backend as K
 from .dataset import DataSet
 from tqdm import tqdm
-
-#from keras import backend as K
-from .dataset import DataSet
 
 # ----------------------------------------------------------------------------
 

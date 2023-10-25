@@ -1,6 +1,7 @@
 import sys
 import numpy as np
 import tensorflow as tf
+
 from scipy import interpolate
 from .model import Model, default_opt
 
@@ -22,10 +23,6 @@ class AudioTfilm(Model):
 
   def __init__(self, from_ckpt=False, n_dim=None, r=2, pool_size = 4, strides=4,
                opt_params=default_opt, log_prefix='./run'):
-
-    #tf.compat.v1.disable_resource_variables()
-    tf.compat.v1.disable_eager_execution()
-
     # perform the usual initialization
     self.r = r
     self.pool_size = pool_size
@@ -40,7 +37,6 @@ class AudioTfilm(Model):
 
     with tf.compat.v1.name_scope('generator'):
       x = X
-      #print("loaded inputs", x)
       L = self.layers
       n_filters = [  128,  256,  512, 512, 512, 512, 512, 512]
       n_blocks = [ 128, 64, 32, 16, 8]
@@ -82,8 +78,6 @@ class AudioTfilm(Model):
 
         # return to original shape
         x_out = tf.reshape(x_out, shape=x_shape)
-
-        #print("x_out", x_out)
 
         return x_out
 

@@ -36,7 +36,7 @@ class Spline(Model):
     X, _, _ = self.inputs
     K.set_session(self.sess)
 
-    with tf.compat.v1.name_scope('generator'):
+    with tf.name_scope('generator'):
       x = X
       return x
 
