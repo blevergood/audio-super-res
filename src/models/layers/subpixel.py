@@ -47,7 +47,7 @@ def SubPixel1D_multichan(I, r):
     X = tf.transpose(a=I, perm=[2,1,0]) # (rc, w, b)
     X = tf.batch_to_space(X, [r], [[0,0]]) # (c, r*w, b)
     X = tf.transpose(a=X, perm=[2,1,0])
-    return X      
+    return X
 
 # ----------------------------------------------------------------------------
 

@@ -2,16 +2,14 @@
 Create an HDF5 file of patches for training super-resolution model.
 """
 
-import argparse
-import os
-import pickle
-import re
-
-import h5py
-import librosa
+import os, argparse
 import numpy as np
+import h5py
+import pickle
+
+import librosa
 from scipy import interpolate
-from scipy.signal import butter, decimate, lfilter
+from scipy.signal import decimate
 
 # ----------------------------------------------------------------------------
 
@@ -43,6 +41,9 @@ parser.add_argument('--full_sample', type=bool, default=True);
 args = parser.parse_args()
 
 # ----------------------------------------------------------------------------
+
+from scipy.signal import butter, lfilter
+import re
 
 
 def butter_bandpass(lowcut, highcut, fs, order=5):
@@ -85,9 +86,10 @@ def add_data(h5_file, inputfiles, args, save_examples=False):
 
   print((len(file_list)))
   for j, file_path in enumerate(file_list):
-    if j % 10 == 0: print(('%d/%d') % (j, num_files))
+    if j % 10 == 0: print('%d/%d' % (j, num_files))
 
-    ID = int(re.search('p\d\d\d/', file_path).group(0)[1:-1])
+    directory_id_matches = re.search(fr'p(\d{{3}})\{os.path.sep}', file_path)
+    ID = int(directory_id_matches.group(1))
 
     # load audio file
     x, fs = librosa.load(file_path, sr=args.sr)
@@ -159,7 +161,7 @@ def add_data(h5_file, inputfiles, args, save_examples=False):
 
     data_set[...] = lr_patches
     label_set[...] = hr_patches
-    print((len(ID_list)))
+    print(len(ID_list))
     pickle.dump(ID_list, open('ID_list_patches_'+str(d)+'_'+str(args.scale), 'wb'))
   else:
     # pickle the data

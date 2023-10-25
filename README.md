@@ -12,15 +12,17 @@ V. Kuleshov, Z. Enam, and S. Ermon. Audio Super Resolution Using Neural Networks
 
 ### Requirements
 
-The model is implemented in Tensorflow and Keras and uses several additional libraries. Specifically, we used:
+The model is implemented in Python 3.7.10 and uses several additional libraries.
 
-* `tensorflow==1.13.1`
-* `keras==1.2.1`
-* `numpy==1.16.4`
-* `scipy==1.2.1`
-* `librosa==0.4.3`
-* `h5py==2.9.0`
-* `matplotlib==1.5.1`
+* `tensorflow==2.4.1`
+* `keras==2.4.0`
+* `numpy==1.19.5`
+* `scipy==1.6.0`
+* `librosa==0.8.3`
+* `h5py==2.10.0`
+* `matplotlib==3.3.4`
+
+A full list of the packages on our enviornment is in `requirements.txt`
 
 ### Setup
 
@@ -29,6 +31,8 @@ To install this package, simply clone the git repo:
 ```
 git clone https://github.com/kuleshov/audio-super-res.git;
 cd audio-super-res;
+conda env create -f environment.yaml
+conda activate audio-super-res
 ```
 
 ## Running the model
@@ -88,6 +92,53 @@ make;
 ```
 
 This will use a set of default parameters.
+
+To generate the files needed for the training example below, run the following from the `speaker1` directory:
+```
+python ../prep_vctk.py \
+  --file-list  speaker1-train-files.txt \
+  --in-dir ../VCTK-Corpus/wav48/p225 \
+  --out vctk-speaker1-train.4.16000.8192.4096.h5 \
+  --scale 4 \
+  --sr 16000 \
+  --dimension 8192 \
+  --stride 4096 \
+  --interpolate \
+  --low-pass
+
+python ../prep_vctk.py \
+  --file-list speaker1-val-files.txt \
+  --in-dir ../VCTK-Corpus/wav48/p225 \
+  --out vctk-speaker1-val.4.16000.8192.4096.h5.tmp \
+  --scale 4 \
+  --sr 16000 \
+  --dimension 8192 \
+  --stride 4096 \
+  --interpolate \
+  --low-pass
+
+python ../prep_vctk.py \
+  --file-list  speaker1-train-files.txt \
+  --in-dir ../VCTK-Corpus/wav48/p225 \
+  --out vctk-speaker1-train.4.16000.-1.4096.h5 \
+  --scale 4 \
+  --sr 16000 \
+  --dimension -1 \
+  --stride 4096 \
+  --interpolate \
+  --low-pass
+
+python ../prep_vctk.py \
+  --file-list speaker1-val-files.txt \
+  --in-dir ../VCTK-Corpus/wav48/p225 \
+  --out vctk-speaker1-val.4.16000.-1.4096.h5.tmp \
+  --scale 4 \
+  --sr 16000 \
+  --dimension -1 \
+  --stride 4096 \
+  --interpolate \
+  --low-pass
+```
 
 ### Audio super resolution tasks
 
@@ -153,14 +204,29 @@ python run.py train \
   --r 4 \
   --layers 4 \
   --piano false \
-  --pool_size 8 \
-  --strides 8
+  --pool_size 2 \
+  --strides 2
   --full true
 ```
 
 The above run will store checkpoints in `./singlespeaker.lr0.000300.1.g4.b64`.
 
 Note on the models: audiotfilm is the best model.
+
+#### Pre-Trained Model
+See the below link for a pre-trained single-speaker model. This model was trained with the following parameters:
+```
+python run.py train \
+  --train ../data/vctk/speaker1/vctk-speaker1-train.4.16000.8192.4096.h5 \
+  --val ../data/vctk/speaker1/vctk-speaker1-val.4.16000.8192.4096.h5 \
+  -e 2   --batch-size 16  --lr 3e-4   --logname singlespeaker \
+  --model audiotfilm   --r 4   --layers 4   --piano false \   
+  --pool_size 2   --strides 2
+```
+
+https://drive.google.com/file/d/1pqIaxtZpt9GRc-Yp1zCzVoSbQFSLnERF/view?usp=sharing
+
+To use the model, unzip the file in the `src` directory and run eval with the logname corresponding to the checkpoint file.
 
 ### Testing the model
 
@@ -189,8 +255,8 @@ python run.py eval \
   --out-label singlespeaker-out \
   --wav-file-list ../data/vctk/speaker1/speaker1-val-files.txt \
   --r 4 \
-  --pool_size 8 \
-  --strides 8 \
+  --pool_size 2 \
+  --strides 2 \
   --model audiotfilm
 ```
 
@@ -199,14 +265,17 @@ and create for each file `f.wav` three audio samples:
 
 * `f.singlespeaker-out.hr.wav`: the high resolution version
 * `f.singlespeaker-out.lr.wav`: the low resolution version processed by the model
-* `f.singlespeaker-out.sr.wav`: the super-resolved version
+* `f.singlespeaker-out.pr.wav`: the super-resolved version
 
 These will be found in the same folder as `f.wav`. Because of how our model is defined, the number of samples in the input must be a multiple of `2**downscaling_layers`; if that's not the case, we will clip the input file (potentially shortening it by a fraction of a second).
+
+**Disclaimer:** We recently upgraded the versions of many of the packages, including Keras and Tensorflow. The example workflow for training and predicting should work, but the codebase has not been fully tested. Please create an issue if you run into any errors.   
 
 ### Keras Layer
 `keras_layer.py` implements the TFiLM layer as a customer Keras layer. The below code illustrates how to use this custom layer.
 
 ```
+import numpy as np
 from keras.layers import Input, Dense, Flatten, Lambda
 from keras.models import Model
 import tensorflow as tf
@@ -218,7 +287,7 @@ y = np.zeros((2))
 
 inputs = Input(shape=(100, 50))
 l = TFiLM(2)(inputs)
-l = Flatten()(x)
+l = Flatten()(l)
 outputs = Dense(1, activation='sigmoid')(l)
 
 
@@ -243,8 +312,8 @@ We would like to emphasize a few points.
 
 ### Extensions
 
-The same architecture can be used on many time series tasks outside the audio domain. We have successfully used it to impute functional genomics data and denoise EEG recordings. Stay tuned for more updates!
+The same architecture can be used on many time series tasks outside the audio domain. We have successfully used it to impute functional genomics data and denoise EEG recordings.
 
 ## Feedback
 
-Send feedback to [Volodymyr Kuleshov](http://www.stanford.edu/~kuleshov).
+Send feedback to [Sawyer Birnbaum](sawyerb@stanford.edu).

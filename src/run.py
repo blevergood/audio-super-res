@@ -1,20 +1,23 @@
 #!/bin/sh
 
-import argparse
 import os
-import pickle
-
-import matplotlib
-import models
-import numpy as np
-from models.io import load_h5, upsample_wav, upsample_bad_wav
-from models.model import default_opt
 
 os.sys.path.append(os.path.abspath('.'))
 os.sys.path.append(os.path.dirname(os.path.abspath('.')))
 
+import matplotlib
 matplotlib.use('Agg')
 
+import argparse
+import numpy as np
+import pickle
+
+import models
+from models.model import default_opt
+from models.io import load_h5, upsample_wav
+import tensorflow as tf
+
+tf.compat.v1.disable_eager_execution()
 
 
 # ----------------------------------------------------------------------------
@@ -28,7 +31,7 @@ def make_parser():
   train_parser = subparsers.add_parser('train')
   train_parser.set_defaults(func=train)
 
-  train_parser.add_argument('--model', default='audiounet',
+  train_parser.add_argument('--model', default='audiotfilm',
     choices=('audiounet', 'audiotfilm', 'dnn', 'spline'),
     help='model to train')
   train_parser.add_argument('--train', required=True,
@@ -135,16 +138,10 @@ def eval(args):
       for line in f:
         try:
           print((line.strip()))
-          if(args.bad_source == 'true'):
-              if(args.speaker == 'single'):
-                upsample_bad_wav('../data/vctk/VCTK-Corpus/wav48/p360/'+line.strip(), args, model)
-              else:
-                upsample_bad_wav('../data/vctk/VCTK-Corpus/'+line.strip(), args, model)
+          if(args.speaker == 'single'):
+            upsample_wav('../data/vctk/VCTK-Corpus/wav48/p225/'+line.strip(), args, model)
           else:
-              if(args.speaker == 'single'):
-                upsample_wav('../data/vctk/VCTK-Corpus/wav48/p360/'+line.strip(), args, model)
-              else:
-                upsample_wav('../data/vctk/VCTK-Corpus/'+line.strip(), args, model)
+            upsample_wav('../data/vctk/VCTK-Corpus/'+line.strip(), args, model)
         except EOFError:
           print('WARNING: Error reading file:', line.strip())
 

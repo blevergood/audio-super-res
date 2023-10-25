@@ -44,14 +44,9 @@ def upsample_wav(wav, args, model):
 
   # save the file
   outname = wav + '.' + args.out_label
-
-  #librosa.write_wav(outname + '.lr.wav', x_lr_t, fs / args.r)
-  #librosa.write_wav(outname + '.hr.wav', x_hr, fs)
-  #librosa.write_wav(outname + '.pr.wav', x_pr, fs)
-
   sf.write(outname + '.lr.wav', x_lr_t, int(fs / args.r))
-  sf.write(outname + '.hr.wav', x_hr, int(fs))
-  sf.write(outname + '.pr.wav', x_pr, int(fs))
+  sf.write(outname + '.hr.wav', x_hr, fs)
+  sf.write(outname + '.pr.wav', x_pr, fs)
 
   # save the spectrum
   S = get_spectrum(x_pr, n_fft=int(2048))

@@ -1,11 +1,11 @@
 SINGLE_SPEAKER_DIR=../VCTK-Corpus/wav48/p360
 
 # patch generation
-SCA=8
-TR_DIM=8192
-TR_STR=8192
-VA_DIM=8192
-VA_STR=8192
+SCA=4
+TR_DIM=-1
+TR_STR=4096
+VA_DIM=-1
+VA_STR=4096
 SR=16000
 
 # ----------------------------------------------------------------------------

@@ -2,24 +2,22 @@ import os
 
 import numpy as np
 import tensorflow as tf
-# from keras import backend as K
-from keras.initializers import RandomNormal as normal
-from keras.layers import Dense, merge
-from keras.layers.advanced_activations import LeakyReLU
+
+from scipy import interpolate
+from .model import Model, default_opt
+
+from .layers.subpixel import SubPixel1D, SubPixel1D_v2
+
+from tensorflow.python.keras import backend as K
+from keras.layers import merge
+from keras.layers.core import Activation, Dropout
 from keras.layers.convolutional import Convolution1D
 from keras.layers.core import Activation, Dropout
 from keras.layers.normalization import BatchNormalization
-from scipy import interpolate
-from tensorflow.compat.v1.keras import backend as K
-
-from .layers.subpixel import SubPixel1D, SubPixel1D_v2
-from .model import Model, default_opt
-
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-
-
-
-
+from keras.layers.advanced_activations import LeakyReLU
+from keras.layers import Dense
+#from keras.initializations import normal
+from keras.initializers import RandomNormal
 
 # ----------------------------------------------------------------------------
 
@@ -66,7 +64,7 @@ class DNN(Model):
                 in_shape = n_dim/2
 
         #x = Dense(units=out_units, input_shape=(in_shape,), init=normal_init)(x)
-        x = Dense(out_units, init=normal_init ,input_dim=(in_shape,))(x)
+        x = Dense(out_units, init=RandomNormal(stdev=0.0000001) ,input_dim=(in_shape,))(x)
         x_shape = tf.shape(input=x)
         x = BatchNormalization()(x)
         x = LeakyReLU(0.2)(x)
@@ -87,9 +85,6 @@ class DNN(Model):
 
 # ----------------------------------------------------------------------------
 # helpers
-
-def normal_init(shape, dim_ordering='tf', name=None):
-    return normal(shape, scale=0.0000001, name=name, dim_ordering=dim_ordering)
 
 def spline_up(x_lr, r):
   x_lr = x_lr.flatten()

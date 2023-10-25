@@ -1,5 +1,4 @@
-URL=http://www.udialogue.org/download/VCTK-Corpus.tar.gz
-#URL:=http://homepages.inf.ed.ac.uk/jyamagis/release/VCTK-Corpus.tar.gz
+URL:=http://www.udialogue.org/download/VCTK-Corpus.tar.gz
 
 # ----------------------------------------------------------------------------
 # load corpus

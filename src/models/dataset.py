@@ -4,7 +4,7 @@ This is stolen from the tensorflow tutorial
 """
 
 import numpy
-#from tensorflow.contrib.learn.python.learn.datasets import base
+
 from tensorflow.python.framework import dtypes
 
 # ----------------------------------------------------------------------------
