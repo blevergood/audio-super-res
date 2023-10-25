@@ -1,6 +1,7 @@
 #!/bin/sh
 
 import os
+
 os.sys.path.append(os.path.abspath('.'))
 os.sys.path.append(os.path.dirname(os.path.abspath('.')))
 
@@ -80,6 +81,7 @@ def make_parser():
   eval_parser.add_argument('--pool_size', type=int, default=4, help='size of pooling window')
   eval_parser.add_argument('--strides', type=int, default=4, help='pooling stide')
   eval_parser.add_argument('--patch_size', type=int, default=8192, help='Size of patches over which the model operates')
+  eval_parser.add_argument('--bad_source', default='false', choices=('true', 'false'))
   return parser
 
 # ----------------------------------------------------------------------------
@@ -91,6 +93,8 @@ def train(args):
   if(args.grocery == 'false'):
     X_train, Y_train = load_h5(args.train)
     X_val, Y_val = load_h5(args.val)
+#    print('Train X_train:', X_train.size)
+#    print('Train Y_tain:', Y_train.size)
   else:
     X_train = pickle.load(open("../data/grocery/grocery/grocery-train-data" + args.train))
     Y_train = pickle.load(open("../data/grocery/grocery/grocery-train-label" + args.train))
