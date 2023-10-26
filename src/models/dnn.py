@@ -1,4 +1,5 @@
 import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 import numpy as np
 import tensorflow as tf
@@ -12,7 +13,6 @@ from tensorflow.python.keras import backend as K
 from keras.layers import merge
 from keras.layers.core import Activation, Dropout
 from keras.layers.convolutional import Convolution1D
-from keras.layers.core import Activation, Dropout
 from keras.layers.normalization import BatchNormalization
 from keras.layers.advanced_activations import LeakyReLU
 from keras.layers import Dense
